@@ -17,19 +17,26 @@ st.set_page_config(page_title="🔐 Secure Vault", layout="centered")
 st.markdown("""
     <style>
         .stApp {
-            background-color: #141421;
-            color: #ffffff;
+            background-color: #f5f6fa;
+            color: #000000;
         }
         .main > div {
-            background: linear-gradient(135deg, #2e2e3e, #3a3a4f);
+            background: linear-gradient(135deg, #ffffff, #e0e0f0);
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0px 4px 30px rgba(255, 255, 255, 0.2);
+            box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.1);
         }
         h1 {
             text-align: center;
             font-size: 36px;
             font-weight: bold;
+            color: #111111;
+        }
+        h2, h3, h4 {
+            color: #222222;
+        }
+        p, label, span, li {
+            color: #333333;
         }
         @media only screen and (max-width: 768px) {
             h1 {
@@ -41,18 +48,19 @@ st.markdown("""
             content: "Created by HAMZA";
             display: block;
             text-align: center;
-            color: #888;
+            color: #555;
             margin-top: 20px;
             font-size: 12px;
         }
         button[kind="primary"] {
-            background-color: #4a90e2 !important;
+            background-color: #1e88e5 !important;
             color: white !important;
             border-radius: 8px;
         }
-        .stTextInput input, .stNumberInput input {
-            background-color: #2c2c3e;
-            color: white;
+        .stTextInput input, .stNumberInput input, .stPasswordInput input {
+            background-color: #ffffff;
+            color: #000000;
+            border: 1px solid #ccc;
         }
     </style>
 """, unsafe_allow_html=True)
