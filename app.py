@@ -17,26 +17,19 @@ st.set_page_config(page_title="🔐 Secure Vault", layout="centered")
 st.markdown("""
     <style>
         .stApp {
-            background-color: #f5f6fa;
-            color: #000000;
+            background-color: #1f1f2e;
+            color: #ffffff;
         }
         .main > div {
-            background: linear-gradient(135deg, #ffffff, #e0e0f0);
+            background: linear-gradient(135deg, #232526, #414345);
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 4px 20px rgba(255, 255, 255, 0.1);
         }
         h1 {
             text-align: center;
             font-size: 36px;
             font-weight: bold;
-            color: #111111;
-        }
-        h2, h3, h4 {
-            color: #222222;
-        }
-        p, label, span, li {
-            color: #333333;
         }
         @media only screen and (max-width: 768px) {
             h1 {
@@ -48,19 +41,9 @@ st.markdown("""
             content: "Created by HAMZA";
             display: block;
             text-align: center;
-            color: #555;
+            color: #aaa;
             margin-top: 20px;
             font-size: 12px;
-        }
-        button[kind="primary"] {
-            background-color: #1e88e5 !important;
-            color: white !important;
-            border-radius: 8px;
-        }
-        .stTextInput input, .stNumberInput input, .stPasswordInput input {
-            background-color: #ffffff;
-            color: #000000;
-            border: 1px solid #ccc;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -140,3 +123,162 @@ def decrypt_data(encrypted_text, passkey):
     if st.session_state.failed_attempts >= 3:
         st.session_state.lockout_time = datetime.now() + timedelta(seconds=30)
     return None
+
+# -------------------- Login & Sign Up Page --------------------
+if not st.session_state.authenticated:
+    st.title("🔐 Welcome to Secure Vault")
+
+    tab1, tab2, tab3 = st.tabs(["🔓 Login", "📝 Sign Up", "🔄 Reset Password"])
+
+    with tab2:
+        st.subheader("🧾 Create New Account")
+        full_name = st.text_input("🧑 Full Name")
+        email = st.text_input("📧 Email")
+        age = st.number_input("🎂 Age", min_value=10, max_value=120)
+        new_user = st.text_input("👤 Username")
+        new_pass = st.text_input("🔑 Password", type="password")
+        strength, feedback = evaluate_password_strength(new_pass)
+
+        if new_pass:
+            st.info(f"💪 Strength: **{strength}**")
+            st.write("💡 Suggestions:")
+            for line in feedback.split("\n"):
+                st.write(f"- {line}")
+
+        if st.button("✅ Register"):
+            if all([full_name, email, new_user, new_pass]) and strength == "Strong":
+                if new_user in users:
+                    st.error("⚠️ Username already exists.")
+                else:
+                    user_key = generate_user_key()
+                    users[new_user] = {
+                        "password": hash_passkey(new_pass),
+                        "key": user_key,
+                        "email": email,
+                        "full_name": full_name,
+                        "age": age
+                    }
+                    save_json(USER_DB_FILE, users)
+                    stored_data[new_user] = {}
+                    save_json(DATA_DB_FILE, stored_data)
+                    st.success("🎉 Account created! Please log in.")
+            else:
+                st.error("❌ Please complete all fields and use a strong password.")
+
+    with tab1:
+        st.subheader("🔐 User Login")
+        username = st.text_input("👤 Username", key="login_user")
+        password = st.text_input("🔑 Password", type="password", key="login_pass")
+
+        if st.button("🚪 Login"):
+            if username in users and users[username]["password"] == hash_passkey(password):
+                st.session_state.authenticated = True
+                st.session_state.username = username
+                st.success("✅ Logged in successfully!")
+                st.rerun()
+            else:
+                st.error("❌ Invalid credentials.")
+
+    with tab3:
+        st.subheader("🔄 Reset Your Password")
+        reset_user = st.text_input("👤 Enter your username", key="reset_user")
+        new_password = st.text_input("🔐 Enter new password", type="password", key="reset_pass")
+        strength, feedback = evaluate_password_strength(new_password)
+
+        if new_password:
+            st.info(f"💪 Strength: **{strength}**")
+            st.write("💡 Suggestions:")
+            for line in feedback.split("\n"):
+                st.write(f"- {line}")
+
+        if st.button("🔁 Reset Password"):
+            if reset_user in users:
+                if strength == "Strong":
+                    users[reset_user]["password"] = hash_passkey(new_password)
+                    save_json(USER_DB_FILE, users)
+                    st.success("✅ Password reset successfully! Please log in.")
+                else:
+                    st.error("❌ Please choose a stronger password.")
+            else:
+                st.error("⚠️ Username not found.")
+
+# -------------------- Main App --------------------
+else:
+    st.title(f"🛡️ Hello, {st.session_state.username} - Welcome to Your Secure Vault")
+
+    menu = ["🏠 Home", "📂 Store Data", "🔍 Retrieve Data", "📥 Download Data", "🚪 Logout"]
+    choice = st.sidebar.selectbox("📁 Navigation Menu", menu)
+
+    if choice == "🚪 Logout":
+        st.session_state.authenticated = False
+        st.session_state.username = ""
+        st.success("👋 Logged out successfully.")
+        st.rerun()
+
+    elif choice == "🏠 Home":
+        st.subheader("📊 Dashboard")
+        st.info("Use the sidebar to navigate. Enjoy your secure experience!")
+
+    elif choice == "📂 Store Data":
+        st.subheader("🔐 Encrypt & Store Data")
+        text = st.text_area("📝 Enter data to encrypt")
+        passkey = st.text_input("🔑 Set a passkey to protect this data", type="password")
+
+        if st.button("💾 Encrypt & Save"):
+            if text and passkey:
+                user = st.session_state.username
+                user_key = users[user]["key"]
+                cipher = get_cipher(user_key)
+                encrypted = encrypt_data(text, cipher)
+                hashed = hash_passkey(passkey)
+                stored_data[user][encrypted] = {
+                    "encrypted_text": encrypted,
+                    "passkey": hashed,
+                    "timestamp": datetime.now().isoformat()
+                }
+                save_json(DATA_DB_FILE, stored_data)
+                st.success("✅ Data encrypted and stored securely!")
+                st.code(encrypted, language="text")
+            else:
+                st.error("⚠️ Please fill in all fields.")
+
+    elif choice == "🔍 Retrieve Data":
+        st.subheader("🔍 Retrieve Encrypted Data")
+        user = st.session_state.username
+        user_data = stored_data.get(user, {})
+
+        if user_data:
+            st.write("📦 Available Entries:")
+            encrypted_options = list(user_data.keys())
+            selected_encrypted = st.selectbox("🔐 Select encrypted entry", encrypted_options)
+            passkey = st.text_input("🔑 Enter passkey to decrypt", type="password")
+
+            if st.button("🔓 Decrypt"):
+                decrypted_text = decrypt_data(selected_encrypted, passkey)
+                if decrypted_text:
+                    st.success("✅ Decryption successful!")
+                    st.text_area("🗝️ Decrypted Text", decrypted_text, height=150)
+                else:
+                    if st.session_state.lockout_time and datetime.now() < st.session_state.lockout_time:
+                        remaining = (st.session_state.lockout_time - datetime.now()).seconds
+                        st.error(f"⏳ Too many attempts! Try again in {remaining} seconds.")
+                    else:
+                        st.error("❌ Incorrect passkey.")
+        else:
+            st.info("📭 No data stored yet.")
+
+    elif choice == "📥 Download Data":
+        st.subheader("📥 Download Your Encrypted Data")
+        user = st.session_state.username
+        user_data = stored_data.get(user, {})
+
+        if user_data:
+            data_text = json.dumps(user_data, indent=4)
+            st.download_button(
+                label="⬇️ Download as JSON",
+                data=data_text,
+                file_name=f"{user}_encrypted_data.json",
+                mime="application/json"
+            )
+        else:
+            st.info("📭 No data available to download.")
