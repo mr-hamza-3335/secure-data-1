@@ -26,6 +26,15 @@ st.markdown("""
             padding: 20px;
             box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
         }
+        h1 {
+            text-align: center;
+        }
+        @media only screen and (max-width: 768px) {
+            h1 {
+                font-size: 24px !important;
+                text-align: center;
+            }
+        }
     </style>
 """, unsafe_allow_html=True)
 
