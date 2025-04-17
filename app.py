@@ -9,31 +9,41 @@ import random  # For generating random strings (e.g., passwords)
 import string  # For character sets used in password generation
 
 # -------------------- Constants --------------------
-USER_DB_FILE = "users.json"         # File to store user information (username, password hash, etc.)
-DATA_DB_FILE = "stored_data.json"   # File to store encrypted data by users
+USER_DB_FILE = "users.json"
+DATA_DB_FILE = "stored_data.json"
 
 # -------------------- Page Configuration --------------------
-st.set_page_config(page_title="🔐 Ameer Hamza's Secure Vault", layout="centered")
+st.set_page_config(page_title="🔐 Secure Vault", layout="centered")
 st.markdown("""
     <style>
         .stApp {
-            background-color: #fff5e6;
-            color: #000000;
+            background-color: #1f1f2e;
+            color: #ffffff;
         }
         .main > div {
-            background: #ffffff;
+            background: linear-gradient(135deg, #232526, #414345);
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 4px 20px rgba(255, 255, 255, 0.1);
         }
         h1 {
             text-align: center;
+            font-size: 36px;
+            font-weight: bold;
         }
         @media only screen and (max-width: 768px) {
             h1 {
                 font-size: 24px !important;
                 text-align: center;
             }
+        }
+        footer::after {
+            content: "Created by HAMZA";
+            display: block;
+            text-align: center;
+            color: #aaa;
+            margin-top: 20px;
+            font-size: 12px;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -116,12 +126,15 @@ def decrypt_data(encrypted_text, passkey):
 
 # -------------------- Login & Sign Up Page --------------------
 if not st.session_state.authenticated:
-    st.title("🔐 Welcome to Ameer Hamza's Secure Vault")
+    st.title("🔐 Welcome to Secure Vault")
 
-    tab1, tab2 = st.tabs(["🔓 Login", "📝 Sign Up"])
+    tab1, tab2, tab3 = st.tabs(["🔓 Login", "📝 Sign Up", "🔄 Reset Password"])
 
     with tab2:
         st.subheader("🧾 Create New Account")
+        full_name = st.text_input("🧑 Full Name")
+        email = st.text_input("📧 Email")
+        age = st.number_input("🎂 Age", min_value=10, max_value=120)
         new_user = st.text_input("👤 Username")
         new_pass = st.text_input("🔑 Password", type="password")
         strength, feedback = evaluate_password_strength(new_pass)
@@ -133,21 +146,24 @@ if not st.session_state.authenticated:
                 st.write(f"- {line}")
 
         if st.button("✅ Register"):
-            if new_user and strength == "Strong":
+            if all([full_name, email, new_user, new_pass]) and strength == "Strong":
                 if new_user in users:
                     st.error("⚠️ Username already exists.")
                 else:
                     user_key = generate_user_key()
                     users[new_user] = {
                         "password": hash_passkey(new_pass),
-                        "key": user_key
+                        "key": user_key,
+                        "email": email,
+                        "full_name": full_name,
+                        "age": age
                     }
                     save_json(USER_DB_FILE, users)
                     stored_data[new_user] = {}
                     save_json(DATA_DB_FILE, stored_data)
                     st.success("🎉 Account created! Please log in.")
             else:
-                st.error("❌ Please provide a unique username and strong password.")
+                st.error("❌ Please complete all fields and use a strong password.")
 
     with tab1:
         st.subheader("🔐 User Login")
@@ -162,6 +178,29 @@ if not st.session_state.authenticated:
                 st.rerun()
             else:
                 st.error("❌ Invalid credentials.")
+
+    with tab3:
+        st.subheader("🔄 Reset Your Password")
+        reset_user = st.text_input("👤 Enter your username", key="reset_user")
+        new_password = st.text_input("🔐 Enter new password", type="password", key="reset_pass")
+        strength, feedback = evaluate_password_strength(new_password)
+
+        if new_password:
+            st.info(f"💪 Strength: **{strength}**")
+            st.write("💡 Suggestions:")
+            for line in feedback.split("\n"):
+                st.write(f"- {line}")
+
+        if st.button("🔁 Reset Password"):
+            if reset_user in users:
+                if strength == "Strong":
+                    users[reset_user]["password"] = hash_passkey(new_password)
+                    save_json(USER_DB_FILE, users)
+                    st.success("✅ Password reset successfully! Please log in.")
+                else:
+                    st.error("❌ Please choose a stronger password.")
+            else:
+                st.error("⚠️ Username not found.")
 
 # -------------------- Main App --------------------
 else:
@@ -178,7 +217,7 @@ else:
 
     elif choice == "🏠 Home":
         st.subheader("📊 Dashboard")
-        st.info("Use the sidebar to navigate. Enjoy your secure experience with Ameer Hamza's Vault!")
+        st.info("Use the sidebar to navigate. Enjoy your secure experience!")
 
     elif choice == "📂 Store Data":
         st.subheader("🔐 Encrypt & Store Data")
