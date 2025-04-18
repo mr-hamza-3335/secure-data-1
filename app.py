@@ -49,12 +49,14 @@ st.markdown("""
         }
 
         /* Input fields */
-        input, textarea {
-            background-color: #2e2e2e !important;
-            color: #ffffff !important;
-            border: 1px solid #555 !important;
-            border-radius: 6px;
-        }
+     input, textarea {
+    background-color: #2e2e2e !important;
+    color: #ffffff !important;
+    border: 1px solid #555 !important;
+    border-radius: 6px;
+    cursor: text !important; /* 👈 Add this line */
+}
+
 
         /* Buttons */
         button {
