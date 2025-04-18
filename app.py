@@ -17,36 +17,46 @@ st.set_page_config(page_title="🔐 Secure Vault", layout="centered")
 
 st.markdown("""
     <style>
+        /* Background & Main Container */
         .stApp {
-            background-color: #202020;
+            background-color: #1e1e1e;
             color: #ffffff;
         }
 
-        .main > div {
-            background: linear-gradient(135deg, #232526, #414345);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0px 4px 20px rgba(255, 255, 255, 0.1);
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 36px;
-            font-weight: bold;
+        /* Headings */
+        h1, h2, h3, h4, h5, h6 {
             color: #ffffff;
         }
 
-        label, .stTextInput > label, .stNumberInput > label {
+        /* Tabs (Login, Sign Up, etc.) */
+        .stTabs [role="tab"] {
+            color: #ffffff;
+            background-color: #333333;
+            border-radius: 5px 5px 0 0;
+            padding: 8px 16px;
+            margin-right: 4px;
+        }
+
+        .stTabs [aria-selected="true"] {
+            background-color: #007ACC;
+            color: white;
+        }
+
+        /* Input labels */
+        label, .stTextInput > label, .stNumberInput > label, .stPasswordInput > label {
             color: #cccccc !important;
             font-weight: 500;
         }
 
+        /* Input fields */
         input, textarea {
-            background-color: #2c2f33 !important;
+            background-color: #2e2e2e !important;
             color: #ffffff !important;
+            border: 1px solid #555 !important;
             border-radius: 6px;
         }
 
+        /* Buttons */
         button {
             background-color: #007ACC !important;
             color: white !important;
@@ -54,18 +64,19 @@ st.markdown("""
         }
 
         button:hover {
-            background-color: #005f99 !important;
+            background-color: #005999 !important;
         }
 
         .stDownloadButton button {
             background-color: #28a745 !important;
         }
 
-        @media only screen and (max-width: 768px) {
-            h1 {
-                font-size: 24px !important;
-                text-align: center;
-            }
+        /* Centering Main Panel */
+        .main > div {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0px 4px 20px rgba(255, 255, 255, 0.05);
         }
 
         footer::after {
