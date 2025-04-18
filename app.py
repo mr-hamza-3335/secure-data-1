@@ -18,7 +18,7 @@ st.markdown("""
     <style>
         .stApp {
             background-color: #202020;
-            color: #ffffff;
+            color: #F1F1F1;
         }
         .main > div {
             background: linear-gradient(135deg, #232526, #414345);
