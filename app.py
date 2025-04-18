@@ -1,42 +1,73 @@
 # -------------------- Import Required Libraries --------------------
-import streamlit as st  # Streamlit for the web app interface
-import hashlib  # To hash passwords and passkeys
-import json  # For working with JSON data files
-import os  # For checking file paths
-from cryptography.fernet import Fernet  # To encrypt and decrypt data
-from datetime import datetime, timedelta  # To manage time-based lockouts
-import random  # For generating random strings (e.g., passwords)
-import string  # For character sets used in password generation
+import streamlit as st
+import hashlib
+import json
+import os
+from cryptography.fernet import Fernet
+from datetime import datetime, timedelta
+import random
+import string
 
 # -------------------- Constants --------------------
 USER_DB_FILE = "users.json"
 DATA_DB_FILE = "stored_data.json"
 
-# -------------------- Page Configuration --------------------
+# -------------------- Page Configuration + Styling --------------------
 st.set_page_config(page_title="🔐 Secure Vault", layout="centered")
+
 st.markdown("""
     <style>
         .stApp {
             background-color: #202020;
             color: #ffffff;
         }
+
         .main > div {
             background: linear-gradient(135deg, #232526, #414345);
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0px 4px 20px rgba(255, 255, 255, 0.1);
         }
+
         h1 {
             text-align: center;
             font-size: 36px;
             font-weight: bold;
+            color: #ffffff;
         }
+
+        label, .stTextInput > label, .stNumberInput > label {
+            color: #cccccc !important;
+            font-weight: 500;
+        }
+
+        input, textarea {
+            background-color: #2c2f33 !important;
+            color: #ffffff !important;
+            border-radius: 6px;
+        }
+
+        button {
+            background-color: #007ACC !important;
+            color: white !important;
+            border-radius: 8px;
+        }
+
+        button:hover {
+            background-color: #005f99 !important;
+        }
+
+        .stDownloadButton button {
+            background-color: #28a745 !important;
+        }
+
         @media only screen and (max-width: 768px) {
             h1 {
                 font-size: 24px !important;
                 text-align: center;
             }
         }
+
         footer::after {
             content: "Created by HAMZA";
             display: block;
