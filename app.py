@@ -21,7 +21,7 @@ st.markdown("""
             color: #ffffff;
         }
         .main > div {
-            background: linear-gradient(135deg, #ffffff, #414345);
+            background: linear-gradient(135deg, #232526, #ffffff);
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0px 4px 20px rgba(255, 255, 255, 0.1);
