@@ -17,7 +17,7 @@ st.set_page_config(page_title="🔐 Secure Vault", layout="centered")
 st.markdown("""
     <style>
         .stApp {
-            background-color: #ffffff;
+            background-color: #1034ff;
             color: #ffffff;
         }
         .main > div {
